@@ -1,4 +1,4 @@
-name: Build APK v2
+name: Build APK v3
 
 on:
   workflow_dispatch:
@@ -18,19 +18,19 @@ jobs:
       - name: Descomprimir únicamente la versión v2
         run: |
           set -e
-          test -f LetrasEnVivo-traduccion-v2.zip || {
-            echo "Falta LetrasEnVivo-traduccion-v2.zip en la raíz del repositorio"
+          test -f LetrasEnVivo-traduccion-v3.zip || {
+            echo "Falta LetrasEnVivo-traduccion-v3.zip en la raíz del repositorio"
             exit 1
           }
           rm -rf app
           mkdir app
-          unzip -q LetrasEnVivo-traduccion-v2.zip -d app
+          unzip -q LetrasEnVivo-traduccion-v3.zip -d app
           test -f app/package.json
           test -f app/ci.sh
           grep -q LocalTranslate app/src/bridge.js
           grep -q LocalTranslatePlugin app/native/MainActivity.java
           test -f app/native/LocalTranslatePlugin.java
-          echo "ZIP v2 verificado correctamente"
+          echo "ZIP v3 verificado correctamente"
 
       - uses: actions/setup-node@v4
         with:
@@ -47,12 +47,12 @@ jobs:
           yes | sdkmanager --licenses >/dev/null || true
           sdkmanager "platform-tools" >/dev/null || true
 
-      - name: Compilar APK v2
+      - name: Compilar APK v3
         run: bash app/ci.sh
 
-      - name: Subir APK v2
+      - name: Subir APK v3
         uses: actions/upload-artifact@v4
         with:
-          name: LetrasEnVivo-apk-v2
+          name: LetrasEnVivo-apk-v3
           path: app/android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
