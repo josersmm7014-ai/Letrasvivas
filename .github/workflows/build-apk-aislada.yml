@@ -1,0 +1,68 @@
+name: Build APK aislada
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      CI: true
+      CAPACITOR_TELEMETRY_DISABLED: true
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Descomprimir únicamente la versión v2
+        run: |
+          set -e
+          test -f LetrasEnVivo-traduccion-aislada.zip || {
+            echo "Falta LetrasEnVivo-traduccion-aislada.zip en la raíz del repositorio"
+            exit 1
+          }
+          rm -rf app
+          mkdir app
+          unzip -q LetrasEnVivo-traduccion-aislada.zip -d app
+          test -f app/package.json
+          test -f app/ci.sh
+          grep -q LocalTranslate app/src/bridge.js
+          grep -q LocalTranslatePlugin app/native/MainActivity.java
+          test -f app/native/LocalTranslatePlugin.java
+          echo "ZIP aislada verificado correctamente"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache-dependency-path: app/package.json
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Aceptar licencias Android
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "platform-tools" >/dev/null || true
+
+      - name: Compilar APK aislada
+        run: bash app/ci.sh
+
+      - name: Verificar puente dentro de Android
+        run: |
+          test -f app/www/bridge-v3.js
+          grep -q LocalTranslate app/www/bridge-v3.js
+          test -f app/android/app/src/main/assets/public/bridge-v3.js
+          grep -q LocalTranslate app/android/app/src/main/assets/public/bridge-v3.js
+          test -f app/android/app/src/main/assets/public/translate-bridge.js
+          grep -q LocalTranslate app/android/app/src/main/assets/public/translate-bridge.js
+
+      - name: Subir APK aislada
+        uses: actions/upload-artifact@v4
+        with:
+          name: LetrasEnVivo-apk-aislada
+          path: app/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          
