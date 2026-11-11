@@ -56,6 +56,8 @@ jobs:
           grep -q LocalTranslate app/www/bridge-v3.js
           test -f app/android/app/src/main/assets/public/bridge-v3.js
           grep -q LocalTranslate app/android/app/src/main/assets/public/bridge-v3.js
+          test -f app/android/app/src/main/assets/public/core-bridge.js
+          grep -q MediaSession app/android/app/src/main/assets/public/core-bridge.js
 
       - name: Subir APK audio fix
         uses: actions/upload-artifact@v4
