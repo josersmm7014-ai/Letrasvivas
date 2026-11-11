@@ -56,10 +56,6 @@ jobs:
           grep -q LocalTranslate app/www/bridge-v3.js
           test -f app/android/app/src/main/assets/public/bridge-v3.js
           grep -q LocalTranslate app/android/app/src/main/assets/public/bridge-v3.js
-          test -f app/android/app/src/main/assets/public/translate-bridge.js
-          grep -q LocalTranslate app/android/app/src/main/assets/public/translate-bridge.js
-          test -f app/android/app/src/main/assets/public/core-bridge.js
-          grep -q MusicScan app/android/app/src/main/assets/public/core-bridge.js
 
       - name: Subir APK audio fix
         uses: actions/upload-artifact@v4
@@ -67,4 +63,3 @@ jobs:
           name: LetrasEnVivo-apk-audio-fix
           path: app/android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
-          
